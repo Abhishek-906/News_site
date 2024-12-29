@@ -17,8 +17,9 @@ export default class App extends Component {
         <div className="container my-4" >
         <NavBar/> 
         {/* <Title/> */}
+        <Title/>
            <Routes>
-          <Route exact path="/Home" element={<Title/>}/>
+          {/* <Route exact path="/Home" element={<Title/>}/> */}
             <Route exact path="/general" element={<News key="general" pageSze={3} country={"us"} category="general" />}/>
             <Route exact path="/business" element={<News key="business" pageSze={3} country={"us"} category="business" />}/>
             <Route exact path="/entertainment" element={ <News pageSze={3} key="entertainment" country={"us"} category="entertainment"/>} />
