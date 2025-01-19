@@ -1,22 +1,93 @@
-
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export class NewsItem extends Component {
     render() {
-        let {title, description, imageUrl, newsUrl} = this.props;
+        let { title, description, imageUrl, newsUrl } = this.props;
+
         return (
             <div className="my-3">
                 <div className="card">
-                    <img src={!imageUrl?"https://fdn.gsmarena.com/imgroot/news/21/08/xiaomi-smart-home-india-annoucnements/-476x249w4/gsmarena_00.jpg":imageUrl} className="card-img-top" alt="..."/>
+                    <img
+                        src={
+                            !imageUrl
+                                ? 'https://fdn.gsmarena.com/imgroot/news/21/08/xiaomi-smart-home-india-annoucnements/-476x249w4/gsmarena_00.jpg'
+                                : imageUrl
+                        }
+                        className="card-img-top"
+                        alt={title ? title : 'News'}
+                    />
                     <div className="card-body">
-                        <h5 className="card-title">{title}</h5>
-                        <p className="card-text">{description}</p>
-                        <a rel="noreferrer" href={newsUrl} target="_blank" className="btn btn-sm btn-dark">Read More</a>
+                        <h5 className="card-title">{title ? title : 'Untitled News'}</h5>
+                        <p className="card-text">
+                            {description ? description : 'No description available.'}
+                        </p>
+                        {newsUrl ? (
+                            <a
+                                rel="noreferrer"
+                                href={newsUrl}
+                                target="_blank"
+                                className="btn btn-sm btn-dark"
+                            >
+                                Read More
+                            </a>
+                        ) : (
+                            <button
+                                className="btn btn-sm btn-dark"
+                                disabled
+                                title="No URL available"
+                            >
+                                Read More
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-export default NewsItem
+export default NewsItem;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React, { Component } from 'react'
+
+// export class NewsItem extends Component {
+//     render() {
+//         let {title, description, imageUrl, newsUrl} = this.props;
+//         return (
+//             <div className="my-3">
+//                 <div className="card">
+//                     <img src={!imageUrl?"https://fdn.gsmarena.com/imgroot/news/21/08/xiaomi-smart-home-india-annoucnements/-476x249w4/gsmarena_00.jpg":imageUrl} className="card-img-top" alt="..."/>
+//                     <div className="card-body">
+//                         <h5 className="card-title">{title}</h5>
+//                         <p className="card-text">{description}</p>
+//                         <a rel="noreferrer" href={newsUrl} target="_blank" className="btn btn-sm btn-dark">Read More</a>
+//                     </div>
+//                 </div>
+//             </div>
+//         )
+//     }
+// }
+
+// export default NewsItem
