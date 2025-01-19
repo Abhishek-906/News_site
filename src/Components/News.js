@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NewsItem from './NewsItem';
 import Spinner from './spinner';
 import PropTypes from 'prop-types';
+import mockData from '../mockData.json'; // Import the mock JSON data
 
 export class News extends Component {
     static defaultProps = {
@@ -22,69 +23,39 @@ export class News extends Component {
             articles: [],
             loading: false,
             page: 1,
-            apiUsed: '', // This will store the message for production
         };
     }
 
-    async fetchNews(page) {
-        const apiKey = process.env.REACT_APP_NEWS_API_KEY; // Use the API key from .env file
-        const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${apiKey}&page=${page}&pageSize=${this.props.pageSize}`;
+    fetchMockData(page) {
+        const startIndex = (page - 1) * this.props.pageSize;
+        const endIndex = startIndex + this.props.pageSize;
+        const paginatedArticles = mockData.articles.slice(startIndex, endIndex);
 
-        try {
-            this.setState({ loading: true });
-
-            // Try fetching data from API
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const parsedData = await response.json();
-
-            // If the API fetch fails or returns no data, load mock data from mockData.json
-            if (parsedData.articles && parsedData.articles.length > 0) {
-                this.setState({
-                    articles: parsedData.articles,
-                    totalResults: parsedData.totalResults,
-                    loading: false,
-                    apiUsed: 'API Data Loaded',
-                });
-            } else {
-                // If no API data, load mock data and set message for production
-                this.loadMockData();
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            this.loadMockData(); // Load mock data if the API request fails
-        }
-    }
-
-    // Load mock data
-    async loadMockData() {
-        const mockData = await fetch('/mockData.json').then((res) => res.json());
         this.setState({
-            articles: mockData.articles || [],
-            totalResults: mockData.articles.length || 0,
+            articles: paginatedArticles,
+            totalResults: mockData.articles.length,
             loading: false,
-            apiUsed: 'Using Dummy Data for Production (API key limit reached)',
         });
     }
 
-    async componentDidMount() {
-        await this.fetchNews(this.state.page);
+    componentDidMount() {
+        this.setState({ loading: true }, () => {
+            this.fetchMockData(this.state.page);
+        });
     }
 
-    handlePrevClick = async () => {
+    handlePrevClick = () => {
         const newPage = this.state.page - 1;
-        await this.fetchNews(newPage);
-        this.setState({ page: newPage });
+        this.setState({ page: newPage, loading: true }, () => {
+            this.fetchMockData(newPage);
+        });
     };
 
-    handleNextClick = async () => {
+    handleNextClick = () => {
         const newPage = this.state.page + 1;
-        await this.fetchNews(newPage);
-        this.setState({ page: newPage });
+        this.setState({ page: newPage, loading: true }, () => {
+            this.fetchMockData(newPage);
+        });
     };
 
     render() {
@@ -99,19 +70,14 @@ export class News extends Component {
                         this.state.articles.map((element) => (
                             <div className="col-md-4" key={element.url}>
                                 <NewsItem
-                                    title={element.title ? element.title : ''}
-                                    description={element.description ? element.description : ''}
+                                    title={element.title || ''}
+                                    description={element.description || ''}
                                     imageUrl={element.urlToImage}
                                     newsUrl={element.url}
                                 />
                             </div>
                         ))}
                 </div>
-                {this.state.apiUsed && (
-                    <div className="alert alert-info">
-                        <strong>{this.state.apiUsed}</strong>
-                    </div>
-                )}
                 <div className="container d-flex justify-content-between">
                     <button
                         disabled={this.state.page <= 1}
@@ -122,7 +88,10 @@ export class News extends Component {
                         &larr; Previous
                     </button>
                     <button
-                        disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)}
+                        disabled={
+                            this.state.page + 1 >
+                            Math.ceil(this.state.totalResults / this.props.pageSize)
+                        }
                         type="button"
                         className="btn btn-dark"
                         onClick={this.handleNextClick}
@@ -136,16 +105,6 @@ export class News extends Component {
 }
 
 export default News;
-
-
-
-
-
-
-
-
-
-
 
 
 
