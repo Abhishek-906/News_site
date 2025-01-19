@@ -22,49 +22,53 @@ export class News extends Component {
             articles: [],
             loading: false,
             page: 1,
+            apiUsed: '', // This will store the message for production
         };
     }
 
     async fetchNews(page) {
         const apiKey = process.env.REACT_APP_NEWS_API_KEY; // Use the API key from .env file
-        const apiUrl = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${apiKey}&page=${page}&pageSize=${this.props.pageSize}`;
-        const mockDataUrl = '/mockdata.json'; // Path to the mockdata.json file
+        const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${apiKey}&page=${page}&pageSize=${this.props.pageSize}`;
 
         try {
             this.setState({ loading: true });
-            const response = await fetch(apiUrl);
+
+            // Try fetching data from API
+            const response = await fetch(url);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const parsedData = await response.json();
-            this.setState({
-                articles: parsedData.articles || [],
-                totalResults: parsedData.totalResults || 0,
-                loading: false,
-            });
-        } catch (apiError) {
-            console.error('API fetch failed, attempting to load mock data:', apiError);
 
-            // Fallback to mock data
-            try {
-                const mockResponse = await fetch(mockDataUrl);
-                if (!mockResponse.ok) {
-                    throw new Error(`Mock data error! status: ${mockResponse.status}`);
-                }
-
-                const mockData = await mockResponse.json();
+            // If the API fetch fails or returns no data, load mock data from mockData.json
+            if (parsedData.articles && parsedData.articles.length > 0) {
                 this.setState({
-                    articles: mockData.articles || [],
-                    totalResults: mockData.totalResults || 0,
+                    articles: parsedData.articles,
+                    totalResults: parsedData.totalResults,
                     loading: false,
+                    apiUsed: 'API Data Loaded',
                 });
-            } catch (mockError) {
-                console.error('Failed to load mock data:', mockError);
-                this.setState({ loading: false });
+            } else {
+                // If no API data, load mock data and set message for production
+                this.loadMockData();
             }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            this.loadMockData(); // Load mock data if the API request fails
         }
+    }
+
+    // Load mock data
+    async loadMockData() {
+        const mockData = await fetch('/mockData.json').then((res) => res.json());
+        this.setState({
+            articles: mockData.articles || [],
+            totalResults: mockData.articles.length || 0,
+            loading: false,
+            apiUsed: 'Using Dummy Data for Production (API key limit reached)',
+        });
     }
 
     async componentDidMount() {
@@ -96,15 +100,18 @@ export class News extends Component {
                             <div className="col-md-4" key={element.url}>
                                 <NewsItem
                                     title={element.title ? element.title : ''}
-                                    description={
-                                        element.description ? element.description : ''
-                                    }
+                                    description={element.description ? element.description : ''}
                                     imageUrl={element.urlToImage}
                                     newsUrl={element.url}
                                 />
                             </div>
                         ))}
                 </div>
+                {this.state.apiUsed && (
+                    <div className="alert alert-info">
+                        <strong>{this.state.apiUsed}</strong>
+                    </div>
+                )}
                 <div className="container d-flex justify-content-between">
                     <button
                         disabled={this.state.page <= 1}
@@ -115,10 +122,7 @@ export class News extends Component {
                         &larr; Previous
                     </button>
                     <button
-                        disabled={
-                            this.state.page + 1 >
-                            Math.ceil(this.state.totalResults / this.props.pageSize)
-                        }
+                        disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)}
                         type="button"
                         className="btn btn-dark"
                         onClick={this.handleNextClick}
@@ -132,11 +136,6 @@ export class News extends Component {
 }
 
 export default News;
-
-
-
-
-
 
 
 
