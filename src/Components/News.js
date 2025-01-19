@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import NewsItem from './NewsItem';
 import Spinner from './spinner';
 import PropTypes from 'prop-types';
-import mockData from '../mockData.json'; // Import the mock JSON data
+import mockData from './mockData.json'; // Import the mock JSON data
 
 export class News extends Component {
     static defaultProps = {
@@ -61,6 +61,19 @@ export class News extends Component {
     render() {
         return (
             <div className="container my-3">
+                {/* Notification Banner */}
+                <div
+                    className="alert alert-info text-center"
+                    style={{
+                        fontSize: '16px',
+                        margin: '10px 0',
+                        padding: '10px',
+                        borderRadius: '5px',
+                    }}
+                >
+                    <strong>Note:</strong> In development, data is fetched for free using an API. 
+                    In production, dummy data is used for demonstration purposes.
+                </div>
                 <h1 className="text-center" style={{ margin: '35px 0px' }}>
                     News - Top Headlines
                 </h1>
@@ -105,11 +118,6 @@ export class News extends Component {
 }
 
 export default News;
-
-
-
-
-
 
 
 
