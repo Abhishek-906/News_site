@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import NewsItem from './NewsItem';
 import Spinner from './spinner';
 import PropTypes from 'prop-types';
-import mockData from './mockData.json'; // Import the mock JSON data
+import mockData from '../mockData.json'; // Import the mock JSON data
 
 export class News extends Component {
     static defaultProps = {
@@ -71,8 +71,8 @@ export class News extends Component {
                         borderRadius: '5px',
                     }}
                 >
-                    <strong>Note:</strong> In development, data is fetched for free using an API. 
-                    In production, dummy data is used for demonstration purposes.
+                   <strong>Note:</strong> 
+                   Real-time data is displayed on the development site using an API. For the production site, dummy data is used.
                 </div>
                 <h1 className="text-center" style={{ margin: '35px 0px' }}>
                     News - Top Headlines
